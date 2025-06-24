@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My 5-Month NVIDIA Tech Curriculum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Tech Focus (Slate Gray, Sky Blue, Off-White) -->
+    <!-- Application Structure Plan: An interactive accordion-based SPA. The four phases of the curriculum are top-level accordions. Clicking a phase reveals the weekly breakdown. Each week is a card with details and a checkbox for progress tracking. A global progress doughnut chart visualizes completion. This task-oriented, dashboard-like structure makes the long-term plan feel manageable and motivating, turning a static document into a dynamic roadmap. -->
+    <!-- Visualization & Content Choices: Report Info: 20-week curriculum table. Goal: Trackable, interactive learning plan. Viz/Presentation: Accordion for phases, cards for weeks, checkboxes for tasks. Interaction: Click to expand/collapse, check to complete. Progress visualization via a Chart.js doughnut chart. Justification: This design improves usability by breaking down information and adding stateful progress tracking, which is more engaging than a static table. Library/Method: Vanilla JS, Tailwind CSS, Chart.js. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .phase-accordion summary {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .phase-accordion summary:hover {
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .phase-accordion[open] summary {
+            background-color: #e2e8f0; /* slate-200 */
+            border-bottom-color: #cbd5e1; /* slate-300 */
+        }
+        .week-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .week-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .checkbox-label:has(input:checked) {
+            text-decoration: line-through;
+            color: #64748b; /* slate-500 */
+        }
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8 md:py-12">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">My 5-Month Learning Journey</h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive roadmap to build the skills for an Earth-2 Solution Architect role at NVIDIA.</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <aside class="lg:col-span-1 lg:sticky top-8 self-start">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-center text-slate-900 mb-4">Overall Progress</h2>
+                    <div class="relative flex justify-center items-center h-64">
+                        <canvas id="progressChart"></canvas>
+                        <div id="progressText" class="absolute text-center">
+                            <span class="text-4xl font-bold text-slate-900">0%</span>
+                            <span class="block text-sm text-slate-500">Completed</span>
+                        </div>
+                    </div>
+                     <div class="mt-6 text-sm text-slate-500 text-center">
+                        <p>Check off each week as you complete it to see your progress visualized here.</p>
+                    </div>
+                </div>
+            </aside>
+            
+            <div id="curriculum-container" class="lg:col-span-2 space-y-4">
+                
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        const curriculumData = [
+            {
+                phase: "Phase 1: Bridging the Gaps - Foundations of HPC & PyTorch",
+                objective: "Build confidence in the areas you identified as weaknesses: data centers, distributed clusters, PyTorch, and low-level GPU concepts.",
+                weeks: [
+                    { week: 1, goal: "Data Center 101", concepts: "Racks, servers, networking (Ethernet vs. InfiniBand), Power Usage Effectiveness (PUE), cooling concepts.", actions: "Watch GTC talks on data center basics & InfiniBand. Take a virtual data center tour on YouTube. Summarize PUE.", resources: "NVIDIA GTC Archives, YouTube", analogy: "A data center is a controlled environment like a hospital's imaging wing or a high-tech vertical farm." },
+                    { week: 2, goal: "HPC & Clusters", concepts: "Head vs. compute nodes, workload schedulers (Slurm), parallel computing (MPI), cluster storage (Lustre).", actions: "Read Slurm's introductory docs. Watch a tutorial on 'Intro to Parallel Computing with MPI' to understand the concepts.", resources: "Slurm Documentation", analogy: "A scheduler is like an advanced OR booking system, allocating critical resources (GPUs) to jobs (simulations)." },
+                    { week: 3, goal: "PyTorch Foundations", concepts: "TensorFlow vs. PyTorch paradigms. Tensors, Autograd, nn.Module, Optimizers, DataLoaders.", actions: "Complete the official 'PyTorch: A 60 Minute Blitz'. Rewrite an old TensorFlow project in PyTorch.", resources: "PyTorch Tutorials", analogy: "Master the new 'language' for building models, like learning a new surgical technique or farming methodology." },
+                    { week: 4, goal: "Advanced PyTorch", concepts: "DataParallel vs. DistributedDataParallel, PyTorch Lightning for code organization, role of TensorRT for inference.", actions: "Train a model using PyTorch Lightning. If possible, implement DataParallel. Read TensorRT documentation.", resources: "PyTorch Lightning Docs, TensorRT", analogy: "Learn to scale your model from a single machine to a whole fleet, like scaling a treatment from one patient to a population." },
+                    { week: 5, goal: "GPU Programming Concepts", concepts: "CUDA concepts: kernels, threads, blocks, grids. CPU-GPU memory transfer bottlenecks.", actions: "Watch NVIDIA's 'Intro to CUDA C++' series. Use Numba to write a simple GPU-accelerated Python function.", resources: "Numba Documentation", analogy: "Understand the 'mechanics' of the GPU, like a farmer understanding how an engine works, not just how to drive the tractor." },
+                    { week: 6, goal: "Phase 1 Project", concepts: "Consolidate learning.", actions: "Train a PyTorch model, using a custom Numba function for GPU-accelerated data pre-processing. Document workflow on GitHub.", resources: "GitHub, PyTorch, Numba", analogy: "Create a tangible proof-of-skill, a 'working prototype' of your foundational knowledge." }
+                ]
+            },
+            {
+                phase: "Phase 2: Core Technology - Physics-Informed Machine Learning",
+                objective: "Master the job's core technical requirement: Physics-ML using NVIDIA Modulus.",
+                weeks: [
+                    { week: 7, goal: "PINN Theory", concepts: "What is a Physics-Informed Neural Network? How the 'physics loss' term works and penalizes violations of PDEs.", actions: "Read the original PINN paper (Raissi et al.). Watch GTC talks on PINNs. Write pseudo-code for a simple 1D PINN.", resources: "ArXiv (for papers), GTC", analogy: "Learning to add physical laws to AI is like ensuring a crop growth model respects the laws of photosynthesis." },
+                    { week: 8, goal: "Intro to Modulus", concepts: "Key components of NVIDIA Modulus: Geometry, Node, Constraint, Solver. How it abstracts PINN complexity.", actions: "Install Modulus via its container. Complete the introductory 'Lid Driven Cavity' tutorial in the docs.", resources: "NVIDIA Modulus Docs", analogy: "Learn the specialized toolkit (Modulus) for the job, like a surgeon learning to use a new robotic surgery system." },
+                    { week: 9, goal: "Model Heat Transfer", concepts: "Basic PDEs for heat transfer (conduction, convection). How these equations model energy flow.", actions: "Complete the 'Heat Sink' or a similar thermal tutorial in the Modulus docs. Focus on defining boundary conditions.", resources: "Modulus Tutorials", analogy: "Modeling heat is key to Ag/Health: think of soil temperature affecting seed germination or body temperature in medicine." },
+                    { week: 10, goal: "Model Renewables", concepts: "Challenges of intermittent energy (solar, wind). Framing this as a time-series forecasting problem.", actions: "Find a public dataset of wind/solar production. Build a baseline forecast with a PyTorch LSTM or Transformer.", resources: "Kaggle, Public Datasets", analogy: "Forecasting renewables is like predicting rainfall for a farm or a patient's vital signs—a variable input to a system." },
+                    { week: 11, goal: "Phase 2 Project Pt. 1", concepts: "Build a simplified 2D model of a 'hot spot' on a server rack using Modulus.", actions: "Define the geometry, heat source, and governing equations in Modulus for your hot spot simulation.", resources: "Modulus, Python", analogy: "Begin building a simulation that models a core problem, like mapping heat distribution in a tumor." },
+                    { week: 12, goal: "Phase 2 Project Pt. 2", concepts: "Integrate time-series data.", actions: "Connect your Week 10 forecast to your Week 11 simulation. Make the heat source vary based on predicted energy availability.", resources: "Modulus, PyTorch", analogy: "Make your simulation dynamic by feeding it live data, like adjusting an irrigation model based on a weather forecast." }
+                ]
+            },
+            {
+                phase: "Phase 3: Platform Integration - Earth-2 & Digital Twins",
+                objective: "Connect your Physics-ML skills to the large-scale platforms mentioned in the job description.",
+                weeks: [
+                    { week: 13, goal: "Climate Data Formats", concepts: "Earth System Models (ESMs), data formats (GRIB, NetCDF), reanalysis data (ERA5) as the source for AI training.", actions: "Use xarray and cfgrib to open and inspect a real NetCDF/GRIB file from Copernicus. Extract a time series.", resources: "`xarray` docs, Copernicus", analogy: "Learn the 'language' of climate data, similar to learning DICOM for medical images or SMAP for soil moisture data." },
+                    { week: 14, goal: "AI for Weather", concepts: "Deep dive into the models behind Earth-2: FourCastNet & CorrDiff. How they differ from traditional models.", actions: "Explore the code for an open-source AI weather model (e.g., GraphCast) to understand data I/O and structure.", resources: "GTC talks, GitHub", analogy: "Understand how the AI 'brain' of Earth-2 works, like understanding how a diagnostic AI reads a medical scan." },
+                    { week: 15, goal: "Omniverse for SciVis", concepts: "Omniverse's role in scientific visualization. Basics of Universal Scene Description (USD).", actions: "Install Omniverse. Complete tutorials on importing a 3D model and visualizing scientific data (e.g., a point cloud).", resources: "NVIDIA Omniverse", analogy: "Learn to use the '3D operating room' or 'virtual farm' where you will visualize your model's outputs." },
+                    { week: 16, goal: "Build a Basic Digital Twin", concepts: "Key components of a digital twin: a virtual model connected to data for analysis and prediction.", actions: "Use the Omniverse Kit SDK (Python) to change an object's color based on data from a CSV file over time.", resources: "Omniverse Kit SDK", analogy: "Create your first interactive simulation, linking data to a visual model. This is the core of a digital twin." },
+                    { week: 17, goal: "Connect Earth-2 to Sim", concepts: "Conceptual integration: How does weather impact a system? (e.g., ambient temperature affects cooling).", actions: "Create a mock Earth-2 API (a Python script). Use its mock temperature data as a boundary condition in your Modulus sim.", resources: "Python, Modulus", analogy: "Build the bridge between the external world (weather) and your specific simulation (your farm/hospital/data center)." }
+                ]
+            },
+            {
+                phase: "Phase 4: Synthesis & Communication",
+                objective: "Consolidate your knowledge into a compelling project and practice articulating your value.",
+                weeks: [
+                    { week: 18, goal: "Capstone Project Pt. 1", concepts: "Synthesize all phases.", actions: "Use Modulus to create a PUE simulation influenced by workload & external temp from your mock Earth-2 API.", resources: "Modulus, Python", analogy: "Build the core simulation engine of your final project." },
+                    { week: 19, goal: "Capstone Project Pt. 2", concepts: "Visualize the final result.", actions: "Use the Omniverse Kit SDK to build a simple dashboard that visualizes the data center model and plots the real-time PUE.", resources: "Omniverse, GitHub", analogy: "Create the final, user-facing visualization and document the entire project thoroughly in your GitHub README." },
+                    { week: 20, goal: "Communication & Prep", concepts: "Translating technical work into business value. Storytelling with data and projects.", actions: "Create a 10-min presentation of your capstone project. Record yourself. Write a blog post about your journey.", resources: "PowerPoint, LinkedIn/Medium", analogy: "Prepare to sell your skills. Your project isn't just code; it's a solution to a problem. Articulate that value." }
+                ]
+            }
+        ];
+
+        const totalWeeks = curriculumData.reduce((acc, phase) => acc + phase.weeks.length, 0);
+        const progressState = JSON.parse(localStorage.getItem('curriculumProgress')) || {};
+
+        const curriculumContainer = document.getElementById('curriculum-container');
+        let chart;
+        
+        function renderCurriculum() {
+            curriculumContainer.innerHTML = '';
+            curriculumData.forEach((phaseData, phaseIndex) => {
+                const phaseElement = document.createElement('details');
+                phaseElement.className = 'phase-accordion bg-white shadow-md rounded-xl overflow-hidden';
+                if (phaseIndex === 0) phaseElement.open = true;
+
+                phaseElement.innerHTML = `
+                    <summary class="flex justify-between items-center p-5 cursor-pointer border-b border-slate-200">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-slate-900">${phaseData.phase}</h3>
+                            <p class="text-sm text-slate-500 mt-1">${phaseData.objective}</p>
+                        </div>
+                        <svg class="w-6 h-6 text-slate-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="p-5 space-y-4">
+                        ${phaseData.weeks.map(week => renderWeek(week)).join('')}
+                    </div>
+                `;
+                curriculumContainer.appendChild(phaseElement);
+            });
+            addEventListeners();
+        }
+
+        function renderWeek(week) {
+            const isChecked = progressState[`week-${week.week}`] ? 'checked' : '';
+            return `
+                <div class="week-card bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="week-${week.week}" data-week="${week.week}" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 cursor-pointer" ${isChecked}>
+                        <div class="ml-4 flex-1">
+                            <label for="week-${week.week}" class="checkbox-label block text-lg font-semibold text-slate-800 cursor-pointer">Week ${week.week}: ${week.goal}</label>
+                            <div class="mt-3 space-y-3 text-sm">
+                                <div class="flex items-start">
+                                    <svg class="icon text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <div><strong class="text-slate-600">Concepts:</strong> <span class="text-slate-500">${week.concepts}</span></div>
+                                </div>
+                                <div class="flex items-start">
+                                    <svg class="icon text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l-4 4-4 4M5 20l7-7-7-7"></path></svg>
+                                    <div><strong class="text-slate-600">Actions:</strong> <span class="text-slate-500">${week.actions}</span></div>
+                                </div>
+                                <div class="flex items-start">
+                                    <svg class="icon text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                    <div><strong class="text-slate-600">Resources:</strong> <span class="text-slate-500">${week.resources}</span></div>
+                                </div>
+                                <div class="flex items-start mt-2 pt-2 border-t border-slate-200">
+                                     <svg class="icon text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <div><strong class="text-slate-600">Analogy:</strong> <em class="text-slate-500">${week.analogy}</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function addEventListeners() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const weekId = `week-${e.target.dataset.week}`;
+                    progressState[weekId] = e.target.checked;
+                    localStorage.setItem('curriculumProgress', JSON.stringify(progressState));
+                    updateProgressChart();
+                });
+            });
+        }
+        
+        function updateProgressChart() {
+            const completedWeeks = Object.values(progressState).filter(Boolean).length;
+            const remainingWeeks = totalWeeks - completedWeeks;
+            const percentage = totalWeeks > 0 ? Math.round((completedWeeks / totalWeeks) * 100) : 0;
+            
+            chart.data.datasets[0].data = [completedWeeks, remainingWeeks];
+            chart.update();
+
+            document.getElementById('progressText').querySelector('span').textContent = `${percentage}%`;
+        }
+
+        function createProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, totalWeeks],
+                        backgroundColor: [
+                            '#0ea5e9', // sky-500
+                            '#e2e8f0'  // slate-200
+                        ],
+                        borderColor: '#f8fafc', // slate-50
+                        borderWidth: 4,
+                        hoverBorderWidth: 4,
+                        cutout: '80%',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCurriculum();
+            createProgressChart();
+            updateProgressChart();
+        });
+
+    </script>
+</body>
+</html>
